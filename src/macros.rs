@@ -5,6 +5,7 @@ macro_rules! add_bench {
         bench!(tachyonix);
         bench!(postage_mpsc);
         bench!(tokio_mpsc);
+        bench!(kanal);
     };
 }
 

@@ -143,3 +143,33 @@ pub mod postage_mpsc {
         (Sender { inner: s }, Receiver { inner: r })
     }
 }
+
+pub mod kanal {
+    use ::kanal as kanal_crate;
+
+    use std::fmt::Debug;
+
+    #[derive(Clone)]
+    pub struct Sender<T> {
+        inner: kanal_crate::AsyncSender<T>,
+    }
+    impl<T: Debug> Sender<T> {
+        pub async fn send(&mut self, message: T) {
+            self.inner.send(message).await.unwrap();
+        }
+    }
+
+    pub struct Receiver<T> {
+        inner: kanal_crate::AsyncReceiver<T>,
+    }
+    impl<T> Receiver<T> {
+        pub async fn recv(&mut self) -> Option<T> {
+            self.inner.recv().await.ok()
+        }
+    }
+
+    pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
+        let (s, r) = kanal_crate::bounded_async(capacity);
+        (Sender { inner: s }, Receiver { inner: r })
+    }
+}

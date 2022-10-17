@@ -475,6 +475,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kanal"
+version = "0.1.0-pre1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bec74d6fb49fafe0f1c3c168a9e793e363a5a2be763c52c564c76bc45b5c22fb"
+dependencies = [
+ "lock_api",
+ "pin-project-lite",
+]
+
+[[package]]
 name = "kv-log-macro"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -930,6 +940,7 @@ dependencies = [
  "async-task",
  "asynchronix",
  "flume",
+ "kanal",
  "lexopt",
  "num_cpus",
  "oorandom",

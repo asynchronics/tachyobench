@@ -61,13 +61,15 @@ macro_rules! add_test {
 const BENCHES: &[(&str, &str, &[(ExecutorId, fn(NonZeroU32) -> BenchIterator)])] = &[
     add_test!(funnel, async_channel),
     add_test!(funnel, flume),
-    add_test!(funnel, tachyonix),
+    add_test!(funnel, kanal),
     add_test!(funnel, postage_mpsc),
+    add_test!(funnel, tachyonix),
     add_test!(funnel, tokio_mpsc),
     add_test!(pinball, async_channel),
     add_test!(pinball, flume),
-    add_test!(pinball, tachyonix),
+    add_test!(pinball, kanal),
     add_test!(pinball, postage_mpsc),
+    add_test!(pinball, tachyonix),
     add_test!(pinball, tokio_mpsc),
 ];
 
