@@ -59,7 +59,7 @@ compiler optimizations, so no black-boxing is implemented.
 
 This benchmark is an upgraded version of the classical ping-pong benchmark. Its
 main goal is to measure performance in situations where receivers are often
-starved but sender are never blocked.
+starved but senders are never blocked.
 
 Each test rig consists of a complete graph (a.k.a. fully connected graph) which
 edges are the channels. Each node forwards any message it receives to another
@@ -80,11 +80,11 @@ This benchmark is ubiquitous and often simply referred to as the "MPSC
 benchmark". It consists of a single receiver connected to many senders which
 receive and send messages in a tight loop.
 
-What this benchmark measures is very dependent on many details such as the
-relative timing of enqueue, dequeue and notification operations. Unsurprisingly,
-the standard deviation on the results is large compared to the pinball
-benchmark. Corollary: this type of benchmark is neither very realistic nor very
-objective.
+What this benchmark measures is unfortunately not only related to the absolute
+speed of enqueue, dequeue and notify operations: it also depends on the relative
+speed of these operations. Unsurprisingly, the standard deviation on the results
+is large compared to the pinball benchmark. Corollary: despite its popularity,
+this benchmark is neither very realistic nor very objective.
 
 In this particular implementation, each receiver is connected to 13 senders. The
 benchmark runs 61 such rigs of 13 senders and 1 receiver concurrently.
