@@ -146,6 +146,34 @@ pub mod tachyonix {
     }
 }
 
+pub mod thingbuf {
+    use ::thingbuf::mpsc as channel;
+
+    #[derive(Clone)]
+    pub struct Sender<T> {
+        inner: channel::Sender<T>,
+    }
+    impl<T: std::fmt::Debug + Default + Clone> Sender<T> {
+        pub async fn send(&mut self, message: T) {
+            self.inner.send(message).await.unwrap();
+        }
+    }
+
+    pub struct Receiver<T> {
+        inner: channel::Receiver<T>,
+    }
+    impl<T: Default + Clone> Receiver<T> {
+        pub async fn recv(&mut self) -> Option<T> {
+            self.inner.recv().await
+        }
+    }
+
+    pub fn channel<T: Default + Clone>(capacity: usize) -> (Sender<T>, Receiver<T>) {
+        let (s, r) = channel::channel(capacity);
+        (Sender { inner: s }, Receiver { inner: r })
+    }
+}
+
 pub mod tokio_mpsc {
     use ::tokio::sync::mpsc as channel;
 

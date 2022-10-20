@@ -6,12 +6,13 @@ monitor regressions in [Asynchronix][asynchronix] and [Tachyonix][tachyonix].
 
 ## Channels and runtimes
 
-At the moment, the following MPMC/MPSC channels are available:
+At the moment, the following MPSC/MPMC channels are available:
 - [tachyonix]
 - [async-channel]
 - [flume]
 - [futures-channel]
 - [postage::mpsc]
+- [thingbuf]
 - [tokio::mpsc]
 
 It is possible to select one of the following runtimes:
@@ -25,6 +26,7 @@ It is possible to select one of the following runtimes:
 [flume]: https://github.com/zesterer/flume
 [futures-channel]: https://github.com/rust-lang/futures-rs
 [postage::mpsc]: https://github.com/austinjones/postage-rs
+[thingbuf]: https://github.com/hawkw/thingbuf
 [tokio::mpsc]: https://github.com/tokio-rs/tokio
 [asynchronix]: https://github.com/asynchronics/asynchronix
 [tokio]: https://github.com/tokio-rs/tokio
