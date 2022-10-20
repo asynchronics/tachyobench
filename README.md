@@ -10,6 +10,7 @@ At the moment, the following MPMC/MPSC channels are available:
 - [tachyonix]
 - [async-channel]
 - [flume]
+- [futures-channel]
 - [postage::mpsc]
 - [tokio::mpsc]
 
@@ -22,6 +23,7 @@ It is possible to select one of the following runtimes:
 [tachyonix]: https://github.com/asynchronics/tachyonix
 [async-channel]: https://github.com/smol-rs/async-channel
 [flume]: https://github.com/zesterer/flume
+[futures-channel]: https://github.com/rust-lang/futures-rs
 [postage::mpsc]: https://github.com/austinjones/postage-rs
 [tokio::mpsc]: https://github.com/tokio-rs/tokio
 [asynchronix]: https://github.com/asynchronics/asynchronix

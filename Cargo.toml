@@ -13,6 +13,8 @@ async-channel = "1.7.1"
 async-std = "1.11"
 async-task = "4"
 flume = "0.10.14"
+futures-channel = { version = "0.3.25", features = [ "sink" ] }
+futures-util = { version = "0.3.25", features = [ "sink" ] }
 lexopt = "0.2"
 num_cpus = "1.13"
 oorandom = "11.1"
