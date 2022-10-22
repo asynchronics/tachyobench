@@ -1,18 +1,18 @@
-pub mod tachyonix {
-    use ::tachyonix as tachyonix_crate;
+pub mod async_channel {
+    use ::async_channel as channel;
 
     #[derive(Clone)]
     pub struct Sender<T> {
-        inner: tachyonix_crate::Sender<T>,
+        inner: channel::Sender<T>,
     }
-    impl<T: std::fmt::Debug> Sender<T> {
+    impl<T> Sender<T> {
         pub async fn send(&mut self, message: T) {
             self.inner.send(message).await.unwrap();
         }
     }
 
     pub struct Receiver<T> {
-        inner: tachyonix_crate::Receiver<T>,
+        inner: channel::Receiver<T>,
     }
     impl<T> Receiver<T> {
         pub async fn recv(&mut self) -> Option<T> {
@@ -21,17 +21,17 @@ pub mod tachyonix {
     }
 
     pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
-        let (s, r) = tachyonix_crate::channel(capacity);
+        let (s, r) = channel::bounded(capacity);
         (Sender { inner: s }, Receiver { inner: r })
     }
 }
 
 pub mod flume {
-    use ::flume as flume_crate;
+    use ::flume as channel;
 
     #[derive(Clone)]
     pub struct Sender<T> {
-        inner: flume_crate::Sender<T>,
+        inner: channel::Sender<T>,
     }
     impl<T> Sender<T> {
         pub async fn send(&mut self, message: T) {
@@ -40,7 +40,7 @@ pub mod flume {
     }
 
     pub struct Receiver<T> {
-        inner: flume_crate::Receiver<T>,
+        inner: channel::Receiver<T>,
     }
     impl<T> Receiver<T> {
         pub async fn recv(&mut self) -> Option<T> {
@@ -49,47 +49,21 @@ pub mod flume {
     }
 
     pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
-        let (s, r) = flume_crate::bounded(capacity);
+        let (s, r) = channel::bounded(capacity);
         (Sender { inner: s }, Receiver { inner: r })
     }
 }
 
-pub mod async_channel {
-    use ::async_channel as async_channel_crate;
-
-    #[derive(Clone)]
-    pub struct Sender<T> {
-        inner: async_channel_crate::Sender<T>,
-    }
-    impl<T> Sender<T> {
-        pub async fn send(&mut self, message: T) {
-            self.inner.send(message).await.unwrap();
-        }
-    }
-
-    pub struct Receiver<T> {
-        inner: async_channel_crate::Receiver<T>,
-    }
-    impl<T> Receiver<T> {
-        pub async fn recv(&mut self) -> Option<T> {
-            self.inner.recv().await.ok()
-        }
-    }
-
-    pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
-        let (s, r) = async_channel_crate::bounded(capacity);
-        (Sender { inner: s }, Receiver { inner: r })
-    }
-}
-
-pub mod tokio_mpsc {
-    use ::tokio as tokio_crate;
+pub mod futures_mpsc {
+    use ::futures_channel::mpsc as channel;
+    use ::futures_util::sink::SinkExt;
+    use ::futures_util::stream::StreamExt;
 
     use std::fmt::Debug;
 
     #[derive(Clone)]
     pub struct Sender<T> {
-        inner: tokio_crate::sync::mpsc::Sender<T>,
+        inner: channel::Sender<T>,
     }
     impl<T: Debug> Sender<T> {
         pub async fn send(&mut self, message: T) {
@@ -98,48 +72,16 @@ pub mod tokio_mpsc {
     }
 
     pub struct Receiver<T> {
-        inner: tokio_crate::sync::mpsc::Receiver<T>,
+        inner: channel::Receiver<T>,
     }
     impl<T> Receiver<T> {
         pub async fn recv(&mut self) -> Option<T> {
-            self.inner.recv().await
+            self.inner.next().await
         }
     }
 
     pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
-        let (s, r) = tokio_crate::sync::mpsc::channel(capacity);
-        (Sender { inner: s }, Receiver { inner: r })
-    }
-}
-
-pub mod postage_mpsc {
-    use ::postage as postage_crate;
-    use ::postage::sink::Sink;
-    use ::postage::stream::Stream;
-
-    use std::fmt::Debug;
-
-    #[derive(Clone)]
-    pub struct Sender<T> {
-        inner: postage_crate::mpsc::Sender<T>,
-    }
-    impl<T: Debug> Sender<T> {
-        pub async fn send(&mut self, message: T) {
-            self.inner.send(message).await.unwrap();
-        }
-    }
-
-    pub struct Receiver<T> {
-        inner: postage_crate::mpsc::Receiver<T>,
-    }
-    impl<T> Receiver<T> {
-        pub async fn recv(&mut self) -> Option<T> {
-            self.inner.recv().await
-        }
-    }
-
-    pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
-        let (s, r) = postage_crate::mpsc::channel(capacity);
+        let (s, r) = channel::channel(capacity);
         (Sender { inner: s }, Receiver { inner: r })
     }
 }
@@ -170,6 +112,124 @@ pub mod kanal {
 
     pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
         let (s, r) = kanal_crate::bounded_async(capacity);
+        (Sender { inner: s }, Receiver { inner: r })
+    }
+}
+
+pub mod postage_mpsc {
+    use ::postage::mpsc as channel;
+    use ::postage::sink::Sink;
+    use ::postage::stream::Stream;
+
+    use std::fmt::Debug;
+
+    #[derive(Clone)]
+    pub struct Sender<T> {
+        inner: channel::Sender<T>,
+    }
+    impl<T: Debug> Sender<T> {
+        pub async fn send(&mut self, message: T) {
+            self.inner.send(message).await.unwrap();
+        }
+    }
+
+    pub struct Receiver<T> {
+        inner: channel::Receiver<T>,
+    }
+    impl<T> Receiver<T> {
+        pub async fn recv(&mut self) -> Option<T> {
+            self.inner.recv().await
+        }
+    }
+
+    pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
+        let (s, r) = channel::channel(capacity);
+        (Sender { inner: s }, Receiver { inner: r })
+    }
+}
+
+pub mod tachyonix {
+    use ::tachyonix as channel;
+
+    #[derive(Clone)]
+    pub struct Sender<T> {
+        inner: channel::Sender<T>,
+    }
+    impl<T: std::fmt::Debug> Sender<T> {
+        pub async fn send(&mut self, message: T) {
+            self.inner.send(message).await.unwrap();
+        }
+    }
+
+    pub struct Receiver<T> {
+        inner: channel::Receiver<T>,
+    }
+    impl<T> Receiver<T> {
+        pub async fn recv(&mut self) -> Option<T> {
+            self.inner.recv().await.ok()
+        }
+    }
+
+    pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
+        let (s, r) = channel::channel(capacity);
+        (Sender { inner: s }, Receiver { inner: r })
+    }
+}
+
+pub mod thingbuf {
+    use ::thingbuf::mpsc as channel;
+
+    #[derive(Clone)]
+    pub struct Sender<T> {
+        inner: channel::Sender<T>,
+    }
+    impl<T: std::fmt::Debug + Default + Clone> Sender<T> {
+        pub async fn send(&mut self, message: T) {
+            self.inner.send(message).await.unwrap();
+        }
+    }
+
+    pub struct Receiver<T> {
+        inner: channel::Receiver<T>,
+    }
+    impl<T: Default + Clone> Receiver<T> {
+        pub async fn recv(&mut self) -> Option<T> {
+            self.inner.recv().await
+        }
+    }
+
+    pub fn channel<T: Default + Clone>(capacity: usize) -> (Sender<T>, Receiver<T>) {
+        let (s, r) = channel::channel(capacity);
+        (Sender { inner: s }, Receiver { inner: r })
+    }
+}
+
+pub mod tokio_mpsc {
+    use ::tokio::sync::mpsc as channel;
+
+    use std::fmt::Debug;
+
+    #[derive(Clone)]
+    pub struct Sender<T> {
+        inner: channel::Sender<T>,
+    }
+    impl<T: Debug> Sender<T> {
+        pub async fn send(&mut self, message: T) {
+            self.inner.send(message).await.unwrap();
+        }
+    }
+
+    pub struct Receiver<T> {
+        inner: channel::Receiver<T>,
+    }
+    impl<T> Receiver<T> {
+        pub async fn recv(&mut self) -> Option<T> {
+            self.inner.recv().await
+        }
+    }
+
+    pub fn channel<T>(capacity: usize) -> (Sender<T>, Receiver<T>) {
+        let (s, r) = channel::channel(capacity);
         (Sender { inner: s }, Receiver { inner: r })
     }
 }

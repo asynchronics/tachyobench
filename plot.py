@@ -26,7 +26,7 @@ def plot(data, x_label, title):
     MULTIPLIER = 1e-6 # convert y units from msg/s to msg/us
 
     parameter_labels = [int(param) for param in data[:,0]]
-    channel_labels = ['async-channel::bounded', 'flume::bounded', 'postage::mpsc', 'tachyonix', 'tokio::mpsc']
+    channel_labels = ['async-channel::bounded', 'flume::bounded', 'futures::mpsc', 'postage::mpsc', 'tachyonix', 'thingbuf', 'tokio::mpsc']
 
     data = numpy.transpose(data[:, 1:])
     x = numpy.arange(len(parameter_labels))
