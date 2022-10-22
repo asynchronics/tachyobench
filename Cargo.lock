@@ -136,7 +136,7 @@ checksum = "7a40729d2133846d9ed0ea60a8b9541bccddab49cd30f0715a1da672fe9a2524"
 [[package]]
 name = "asynchronix"
 version = "0.1.0"
-source = "git+https://github.com/asynchronics/asynchronix/#d2cfbcfa3476aaf20da945813a3393825cc04340"
+source = "git+https://github.com/asynchronics/asynchronix/#835dd5ea8eab8cd9107f3fef46e661ad604343c1"
 dependencies = [
  "cache-padded",
  "crossbeam-utils",
