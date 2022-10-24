@@ -84,11 +84,12 @@ This benchmark is ubiquitous and often simply referred to as the "MPSC
 benchmark". It consists of a single receiver connected to many senders which
 receive and send messages in a tight loop.
 
-What this benchmark measures is unfortunately not only related to the absolute
-speed of enqueue, dequeue and notify operations: it also depends on the relative
-speed of these operations. Unsurprisingly, the standard deviation on the results
-is large compared to the pinball benchmark. Corollary: despite its popularity,
-this benchmark is neither very realistic nor very objective.
+What this benchmark measures is unfortunately not always clear. It is not only
+sensitive to the absolute performance of enqueue, dequeue and notify operations,
+but is also strongly depends on their relative speed. Unsurprisingly, the
+standard deviation on the results is large compared to the pinball benchmark.
+Corollary: despite its popularity, **this benchmark is neither very realistic
+nor very objective**. It is kept here mainly because people expect it.
 
 In this particular implementation, each receiver is connected to 13 senders. The
 benchmark runs 61 such rigs of 13 senders and 1 receiver concurrently.
