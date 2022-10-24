@@ -14,6 +14,7 @@ import argparse
 #                           - async-channel::bounded
 #                           - flume::bounded
 #                           - futures::mpsc
+#                           - kanal
 #                           - postage::mpsc
 #                           - tachyonix
 #                           - thingbuf
@@ -29,14 +30,14 @@ import argparse
 #                         name of the file to which the PNG plot should be saved
 
 
-mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=["tab:blue", "tab:orange", "tab:green", "tab:purple", "tab:red", "tab:brown", "tab:pink"])
+mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=["tab:blue", "tab:orange", "tab:green", "tab:gray", "tab:purple", "tab:red", "tab:brown", "tab:pink"])
 
 def plot(data, x_label, title, output):
     WIDTH = 0.5  # total width of a group of bars
     MULTIPLIER = 1e-6 # convert y units from msg/s to msg/µs
 
     parameter_labels = [int(param) for param in data[:,0]]
-    channel_labels = ['async-channel::bounded', 'flume::bounded', 'futures::mpsc', 'postage::mpsc', 'tachyonix', 'thingbuf', 'tokio::mpsc']
+    channel_labels = ['async-channel::bounded', 'flume::bounded', 'futures::mpsc', 'kanal', 'postage::mpsc', 'tachyonix', 'thingbuf', 'tokio::mpsc']
 
     data = numpy.transpose(data[:, 1:])
     x = numpy.arange(len(parameter_labels))
@@ -69,7 +70,7 @@ if __name__ == '__main__':
     parser.add_argument("file", help="""
 space-separated data file; the first column is the
 parameter; the next columns are the throughput in msg/s for:
-async-channel::bounded, flume::bounded, futures::mpsc,
+async-channel::bounded, flume::bounded, futures::mpsc, kanal,
 postage::mpsc, tachyonix, thingbuf, tokio::mpsc""")
     parser.add_argument("-x", "--xlabel", help="label of the x axis")
     parser.add_argument("-t", "--title", help="title of the plot")
