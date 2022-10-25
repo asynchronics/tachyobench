@@ -95,8 +95,9 @@ In this particular implementation, each receiver is connected to 13 senders. The
 benchmark runs 61 such rigs of 13 senders and 1 receiver concurrently.
 
 The test is performed for various channel capacities. Note that unlike the other
-channels, tokio's MPSC channel reserves 1 additional slot for each of the 13
-senders on top of the nominal capacity.
+channels, the MPSC channel of the `futures` crate reserves 1 additional slot for
+each of the 13 senders on top of the nominal capacity, so it has a slight
+advantage at low nominal capacities.
 
 
 ## Example usage
