@@ -978,8 +978,7 @@ dependencies = [
 [[package]]
 name = "tachyonix"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f1d296a28a5fa4918f3abf7d45a133c40f16eb0a1a31f7cca59ec9f60f020eb"
+source = "git+https://github.com/asynchronics/tachyonix?rev=0bcd052#0bcd052ed12ff12c1351b361b67b0b3f1639f5ac"
 dependencies = [
  "cache-padded",
  "diatomic-waker",
