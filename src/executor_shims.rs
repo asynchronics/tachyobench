@@ -37,10 +37,12 @@ impl Default for TokioExecutor {
     }
 }
 
+#[cfg(feature = "async-std")]
 #[derive(Default)]
 pub struct AsyncStdExecutor {
     join_handles: Vec<::async_std::task::JoinHandle<()>>,
 }
+#[cfg(feature = "async-std")]
 impl Executor for AsyncStdExecutor {
     fn spawn<T: Future<Output = ()> + Send + 'static>(&mut self, future: T) {
         self.join_handles.push(::async_std::task::spawn(future));
@@ -55,10 +57,12 @@ impl Executor for AsyncStdExecutor {
     }
 }
 
+#[cfg(feature = "smolscale")]
 #[derive(Default)]
 pub struct SmolScaleExecutor {
     join_handles: Vec<::async_task::Task<()>>,
 }
+#[cfg(feature = "smolscale")]
 impl Executor for SmolScaleExecutor {
     fn spawn<T: Future<Output = ()> + Send + 'static>(&mut self, future: T) {
         self.join_handles.push(::smolscale::spawn(future));

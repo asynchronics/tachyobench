@@ -12,7 +12,7 @@ mod executor_shims;
 mod macros;
 
 const HELP_MESSAGE: &str = "\
-bench
+tachyobench
 Benchmark runner for Tachyonix
 
 USAGE:
@@ -27,8 +27,11 @@ OPTIONS:
     -s, --samples SAMPLES  Repeat benches SAMPLES times and average the result
     -o, --output FILE      Save the results to FILE
     -e, --exec EXECUTOR    Run the bench with the EXECUTOR runtime;
-                           possible values: tokio [default], async-std,
-                           smolscale, asynchronix";
+                           possible values:
+                               tokio [default],
+                               asynchronix,
+                               async-std [requires feature 'async-std'],
+                               smolscale [requires feature 'smolscale']";
 
 macro_rules! add_test {
     ($group:ident, $channel:ident) => {
@@ -40,10 +43,12 @@ macro_rules! add_test {
                     ExecutorId::Tokio,
                     benches::$group::$channel::bench::<crate::executor_shims::TokioExecutor>,
                 ),
+                #[cfg(feature = "async-std")]
                 (
                     ExecutorId::AsyncStd,
                     benches::$group::$channel::bench::<crate::executor_shims::AsyncStdExecutor>,
                 ),
+                #[cfg(feature = "smolscale")]
                 (
                     ExecutorId::SmolScale,
                     benches::$group::$channel::bench::<crate::executor_shims::SmolScaleExecutor>,
@@ -95,31 +100,39 @@ type BenchIterator = Box<dyn Iterator<Item = BenchResult>>;
 #[derive(PartialEq)]
 enum ExecutorId {
     Tokio,
-    AsyncStd,
-    SmolScale,
     Asynchronix,
+    #[cfg(feature = "async-std")]
+    AsyncStd,
+    #[cfg(feature = "smolscale")]
+    SmolScale,
 }
 impl ExecutorId {
     const TOKIO: &str = "tokio";
-    const ASYNC_STD: &str = "async-std";
-    const SMOLSCALE: &str = "smolscale";
     const ASYNCHRONIX: &str = "asynchronix";
+    #[cfg(feature = "async-std")]
+    const ASYNC_STD: &str = "async-std";
+    #[cfg(feature = "smolscale")]
+    const SMOLSCALE: &str = "smolscale";
 
     fn new(name: &str) -> Result<Self, ()> {
         match name {
             Self::TOKIO => Ok(ExecutorId::Tokio),
-            Self::ASYNC_STD => Ok(ExecutorId::AsyncStd),
-            Self::SMOLSCALE => Ok(ExecutorId::SmolScale),
             Self::ASYNCHRONIX => Ok(ExecutorId::Asynchronix),
+            #[cfg(feature = "async-std")]
+            Self::ASYNC_STD => Ok(ExecutorId::AsyncStd),
+            #[cfg(feature = "smolscale")]
+            Self::SMOLSCALE => Ok(ExecutorId::SmolScale),
             _ => Err(()),
         }
     }
     fn name(&self) -> &'static str {
         match self {
             ExecutorId::Tokio => Self::TOKIO,
-            ExecutorId::AsyncStd => Self::ASYNC_STD,
-            ExecutorId::SmolScale => Self::SMOLSCALE,
             ExecutorId::Asynchronix => Self::ASYNCHRONIX,
+            #[cfg(feature = "async-std")]
+            ExecutorId::AsyncStd => Self::ASYNC_STD,
+            #[cfg(feature = "smolscale")]
+            ExecutorId::SmolScale => Self::SMOLSCALE,
         }
     }
 }

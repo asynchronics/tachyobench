@@ -18,8 +18,8 @@ At the moment, the following MPSC/MPMC channels are available:
 It is possible to select one of the following runtimes:
 - [asynchronix]
 - [tokio]
-- [async-std]
-- [smolscale]
+- [async-std] (supported with feature *async-std*)
+- [smolscale] (supported with feature *smolscale*)
 
 [tachyonix]: https://github.com/asynchronics/tachyonix
 [async-channel]: https://github.com/smol-rs/async-channel
@@ -105,39 +105,41 @@ advantage at low nominal capacities.
 For help, type:
 
 ```
-$ bench -h
+$ tachyobench -h
 ```
 
 To see all benchmarks for all channels, type:
 
 ```
-$ bench -l
+$ tachyobench -l
 ```
 
-To run the *pinball* benchmark for all channels using Tokio, type:
+To run the *pinball* benchmark for all channels using Tokio and write out the
+results to file *results.dat*, type:
 
 ```
-$ bench pinball
+$ tachyobench pinball -o results.dat
 ```
 
 To run all benchmarks for `tachonix` using Tokio, type:
 
 ```
-$ bench tachyonix
+$ tachyobench tachyonix
 ```
 
 To run only the *funnel* benchmark for `flume` using Tokio and average the
 results over 5 runs, type:
 
 ```
-$ bench -s 5 funnel-flume
+$ tachyobench -s 5 funnel-flume
 ```
 
 To run all benchmarks for `async-channel` with Asynchronix instead of Tokio, type:
 
 ```
-$ bench async_channel -e asynchronix
+$ tachyobench async_channel -e asynchronix
 ```
+
 
 ## License
 
