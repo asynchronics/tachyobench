@@ -978,7 +978,7 @@ dependencies = [
 [[package]]
 name = "tachyonix"
 version = "0.1.1"
-source = "git+https://github.com/asynchronics/tachyonix?rev=0bcd052#0bcd052ed12ff12c1351b361b67b0b3f1639f5ac"
+source = "git+https://github.com/asynchronics/tachyonix?rev=a58e0ce#a58e0ceff8c27e5d0d974893ec4daafcc2231754"
 dependencies = [
  "cache-padded",
  "diatomic-waker",

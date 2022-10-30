@@ -20,6 +20,6 @@ num_cpus = "1.13"
 oorandom = "11.1"
 postage = "0.5"
 smolscale = { version = "0.3", optional = true }
-tachyonix = { git = "https://github.com/asynchronics/tachyonix", rev = "0bcd052" }
+tachyonix = { git = "https://github.com/asynchronics/tachyonix", rev = "a58e0ce" }
 thingbuf = "0.1"
 tokio = { version = "1", features = [ "sync", "rt-multi-thread" ] }
