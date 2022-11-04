@@ -225,10 +225,7 @@ fn main() -> Result<(), lexopt::Error> {
                 .find(|(id, _)| executor == *id)
                 .unwrap()
                 .1;
-            benches
-                .entry(*group)
-                .or_insert(BTreeMap::new())
-                .insert(*item, bench);
+            benches.entry(*group).or_default().insert(*item, bench);
         }
     }
 
