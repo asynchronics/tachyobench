@@ -1,25 +1,24 @@
 [package]
 name = "tachyobench"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Serge Barral <serge.barral@asynchronics.com>"]
 edition = "2021"
-rust-version = "1.59"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/asynchronics/tachyobench"
 
 [dependencies]
-asynchronix = { version = "0.1", features = [ "dev-hooks" ] }
-async-channel = "1"
-async-std = { version = "1", optional = true }
+async-channel = "2"
 async-task = "4"
-flume = "0.10"
-futures-channel = { version = "0.3", features = [ "sink" ] }
-futures-util = { version = "0.3", features = [ "sink" ] }
+flume = "0.11"
+futures-channel = { version = "0.3", features = ["sink"] }
+futures-util = { version = "0.3", features = ["sink"] }
 lexopt = "0.2"
+nexosim = { version = "0.3", features = ["dev-hooks"] }
 num_cpus = "1.13"
 oorandom = "11.1"
 postage = "0.5"
-smolscale = { version = "0.3", optional = true }
-tachyonix = { version = "0.2" }
+smol = { version = "2", optional = true }
+smolscale = { version = "0.4", optional = true }
+tachyonix = "0.3"
 thingbuf = "0.1"
-tokio = { version = "1", features = [ "sync", "rt-multi-thread" ] }
+tokio = { version = "1", features = ["sync", "rt-multi-thread"] }

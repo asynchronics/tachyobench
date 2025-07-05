@@ -17,7 +17,7 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.64.0
+          - 1.82.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
 
       - name: Run cargo check
-        run: cargo check
+        run: cargo check --all-features
 
   lints:
     name: Lints
@@ -46,4 +46,4 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Run cargo clippy
-        run: cargo clippy
+        run: cargo clippy --all-features

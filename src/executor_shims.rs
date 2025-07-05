@@ -37,19 +37,25 @@ impl Default for TokioExecutor {
     }
 }
 
-#[cfg(feature = "async-std")]
+#[cfg(feature = "smol")]
+static SMOL_EXECUTOR: ::smol::Executor<'static> = ::smol::Executor::new();
+
+#[cfg(feature = "smol")]
 #[derive(Default)]
-pub struct AsyncStdExecutor {
-    join_handles: Vec<::async_std::task::JoinHandle<()>>,
+pub struct SmolExecutor {
+    join_handles: Vec<::smol::Task<()>>,
 }
-#[cfg(feature = "async-std")]
-impl Executor for AsyncStdExecutor {
+#[cfg(feature = "smol")]
+impl Executor for SmolExecutor {
     fn spawn<T: Future<Output = ()> + Send + 'static>(&mut self, future: T) {
-        self.join_handles.push(::async_std::task::spawn(future));
+        self.join_handles.push(SMOL_EXECUTOR.spawn(future));
     }
     fn join_all(&mut self) {
         let join_handles = std::mem::take(&mut self.join_handles);
-        ::async_std::task::block_on(async move {
+        std::thread::spawn(move || {
+            smol::future::block_on(SMOL_EXECUTOR.run(smol::future::pending::<()>()))
+        });
+        ::smol::future::block_on(async move {
             for fut in join_handles {
                 fut.await;
             }
@@ -77,10 +83,10 @@ impl Executor for SmolScaleExecutor {
     }
 }
 
-pub struct AsynchronixExecutor {
-    executor: ::asynchronix::dev_hooks::Executor,
+pub struct NexosimExecutor {
+    executor: ::nexosim::dev_hooks::Executor,
 }
-impl Executor for AsynchronixExecutor {
+impl Executor for NexosimExecutor {
     fn spawn<T: Future<Output = ()> + Send + 'static>(&mut self, future: T) {
         self.executor.spawn_and_forget(future);
     }
@@ -89,10 +95,10 @@ impl Executor for AsynchronixExecutor {
     }
 }
 
-impl Default for AsynchronixExecutor {
+impl Default for NexosimExecutor {
     fn default() -> Self {
         Self {
-            executor: ::asynchronix::dev_hooks::Executor::new(::num_cpus::get()),
+            executor: ::nexosim::dev_hooks::Executor::new(::num_cpus::get()),
         }
     }
 }

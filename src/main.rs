@@ -29,8 +29,8 @@ OPTIONS:
     -e, --exec EXECUTOR    Run the bench with the EXECUTOR runtime;
                            possible values:
                                tokio [default],
-                               asynchronix,
-                               async-std [requires feature 'async-std'],
+                               nexosim,
+                               smol [requires feature 'smol'],
                                smolscale [requires feature 'smolscale']";
 
 macro_rules! add_test {
@@ -43,10 +43,10 @@ macro_rules! add_test {
                     ExecutorId::Tokio,
                     benches::$group::$channel::bench::<crate::executor_shims::TokioExecutor>,
                 ),
-                #[cfg(feature = "async-std")]
+                #[cfg(feature = "smol")]
                 (
-                    ExecutorId::AsyncStd,
-                    benches::$group::$channel::bench::<crate::executor_shims::AsyncStdExecutor>,
+                    ExecutorId::Smol,
+                    benches::$group::$channel::bench::<crate::executor_shims::SmolExecutor>,
                 ),
                 #[cfg(feature = "smolscale")]
                 (
@@ -54,8 +54,8 @@ macro_rules! add_test {
                     benches::$group::$channel::bench::<crate::executor_shims::SmolScaleExecutor>,
                 ),
                 (
-                    ExecutorId::Asynchronix,
-                    benches::$group::$channel::bench::<crate::executor_shims::AsynchronixExecutor>,
+                    ExecutorId::Nexosim,
+                    benches::$group::$channel::bench::<crate::executor_shims::NexosimExecutor>,
                 ),
             ],
         )
@@ -100,26 +100,26 @@ type BenchIterator = Box<dyn Iterator<Item = BenchResult>>;
 #[derive(PartialEq)]
 enum ExecutorId {
     Tokio,
-    Asynchronix,
-    #[cfg(feature = "async-std")]
-    AsyncStd,
+    Nexosim,
+    #[cfg(feature = "smol")]
+    Smol,
     #[cfg(feature = "smolscale")]
     SmolScale,
 }
 impl ExecutorId {
-    const TOKIO: &str = "tokio";
-    const ASYNCHRONIX: &str = "asynchronix";
-    #[cfg(feature = "async-std")]
-    const ASYNC_STD: &str = "async-std";
+    const TOKIO: &'static str = "tokio";
+    const NEXOSIM: &'static str = "nexosim";
+    #[cfg(feature = "smol")]
+    const SMOL: &'static str = "smol";
     #[cfg(feature = "smolscale")]
-    const SMOLSCALE: &str = "smolscale";
+    const SMOLSCALE: &'static str = "smolscale";
 
     fn new(name: &str) -> Result<Self, ()> {
         match name {
             Self::TOKIO => Ok(ExecutorId::Tokio),
-            Self::ASYNCHRONIX => Ok(ExecutorId::Asynchronix),
-            #[cfg(feature = "async-std")]
-            Self::ASYNC_STD => Ok(ExecutorId::AsyncStd),
+            Self::NEXOSIM => Ok(ExecutorId::Nexosim),
+            #[cfg(feature = "smol")]
+            Self::SMOL => Ok(ExecutorId::Smol),
             #[cfg(feature = "smolscale")]
             Self::SMOLSCALE => Ok(ExecutorId::SmolScale),
             _ => Err(()),
@@ -128,9 +128,9 @@ impl ExecutorId {
     fn name(&self) -> &'static str {
         match self {
             ExecutorId::Tokio => Self::TOKIO,
-            ExecutorId::Asynchronix => Self::ASYNCHRONIX,
-            #[cfg(feature = "async-std")]
-            ExecutorId::AsyncStd => Self::ASYNC_STD,
+            ExecutorId::Nexosim => Self::NEXOSIM,
+            #[cfg(feature = "smol")]
+            ExecutorId::Smol => Self::SMOL,
             #[cfg(feature = "smolscale")]
             ExecutorId::SmolScale => Self::SMOLSCALE,
         }
@@ -154,13 +154,13 @@ fn parse_args() -> Result<Option<BenchArgs>, lexopt::Error> {
     while let Some(arg) = parser.next()? {
         match arg {
             Short('h') | Long("help") => {
-                println!("{}", HELP_MESSAGE);
+                println!("{HELP_MESSAGE}");
 
                 return Ok(None);
             }
             Short('l') | Long("list") => {
                 for (group, item, _) in BENCHES {
-                    println!("    {}-{}", group, item)
+                    println!("    {group}-{item}")
                 }
 
                 return Ok(None);
@@ -214,7 +214,7 @@ fn main() -> Result<(), lexopt::Error> {
 
     // Select all requested benches.
     for (group, item, executor_benches) in BENCHES {
-        let bench_name = format!("{}-{}", group, item);
+        let bench_name = format!("{group}-{item}");
         if bench_substrings.is_empty()
             || bench_substrings
                 .iter()
@@ -246,12 +246,11 @@ fn main() -> Result<(), lexopt::Error> {
     // Run sequentially all requested benchmarks.
     for (group, benches) in benches {
         println!(
-            "Running benchmark '{}' with the {} runtime.",
-            group,
+            "Running benchmark '{group}' with the {} runtime.",
             executor.name()
         );
         if samples.get() != 1 {
-            println!("All results are averaged over {} runs.", samples);
+            println!("All results are averaged over {samples} runs.");
         }
 
         // Only used when saving to file.
@@ -260,7 +259,7 @@ fn main() -> Result<(), lexopt::Error> {
         let mut columns = Vec::new();
 
         for (bench_id, (name, bench)) in benches.into_iter().enumerate() {
-            println!("    {}:", name);
+            println!("    {name}:");
             let mut data_column = Vec::new();
 
             for (
@@ -270,7 +269,7 @@ fn main() -> Result<(), lexopt::Error> {
                     parameter,
                     throughput,
                 },
-            ) in bench(samples).into_iter().enumerate()
+            ) in bench(samples).enumerate()
             {
                 assert!(!throughput.is_empty());
 
@@ -283,13 +282,13 @@ fn main() -> Result<(), lexopt::Error> {
                     if bench_id == 0 {
                         parameter_column.push(parameter.clone());
                     }
-                    data_column.push(format!("{:.0}", mean));
+                    data_column.push(format!("{mean:.0}"));
                 }
 
                 if throughput.len() == 1 {
                     println!(
                         "        {:<20} {:>12.3} msg/µs",
-                        format!("{}={}", label, parameter),
+                        format!("{label}={parameter}"),
                         mean / 1e6
                     );
                 } else {
@@ -301,7 +300,7 @@ fn main() -> Result<(), lexopt::Error> {
 
                     println!(
                         "        {:<20} {:>12.3} msg/µs [±{:.3}]",
-                        format!("{}: {}", label, parameter),
+                        format!("{label}: {parameter}"),
                         mean * 1e-6,
                         std_dev * 1e-6
                     );
@@ -326,7 +325,7 @@ fn main() -> Result<(), lexopt::Error> {
             .unwrap();
             write!(file, "#").unwrap();
             for header in column_headers {
-                write!(file, "{:>15} ", header).unwrap();
+                write!(file, "{header:>15} ").unwrap();
             }
             writeln!(file).unwrap();
             for row in 0..columns[0].len() {

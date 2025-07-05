@@ -1,12 +1,12 @@
 # The tachyonix benchmark
 
 This is a small benchmarking suite for `async` MPSC message passing, used to
-monitor regressions in [Asynchronix][asynchronix] and [Tachyonix][tachyonix].
-
+monitor regressions in [NeXosim][nexosim] and [Tachyonix][tachyonix].
 
 ## Channels and runtimes
 
 At the moment, the following MPSC/MPMC channels are available:
+
 - [tachyonix]
 - [async-channel]
 - [flume]
@@ -16,10 +16,11 @@ At the moment, the following MPSC/MPMC channels are available:
 - [tokio::mpsc]
 
 It is possible to select one of the following runtimes:
-- [asynchronix]
+
+- [nexosim]
 - [tokio]
-- [async-std] (supported with feature *async-std*)
-- [smolscale] (supported with feature *smolscale*)
+- [smol] (supported with feature _smol_)
+- [smolscale] (supported with feature _smolscale_)
 
 [tachyonix]: https://github.com/asynchronics/tachyonix
 [async-channel]: https://github.com/smol-rs/async-channel
@@ -28,21 +29,20 @@ It is possible to select one of the following runtimes:
 [postage::mpsc]: https://github.com/austinjones/postage-rs
 [thingbuf]: https://github.com/hawkw/thingbuf
 [tokio::mpsc]: https://github.com/tokio-rs/tokio
-[asynchronix]: https://github.com/asynchronics/asynchronix
+[nexosim]: https://github.com/asynchronics/nexosim
 [tokio]: https://github.com/tokio-rs/tokio
-[async-std]: https://github.com/async-rs/async-std
+[smol]: https://github.com/smol-rs/smol
 [smolscale]: https://github.com/geph-official/smolscale
-
 
 ## Benchmarks
 
 There are currently 2 parametric benchmarks:
-- *pinball*: fully connected graph where messages ("balls") perform a random
+
+- _pinball_: fully connected graph where messages ("balls") perform a random
   walk between nodes ("pins"),
-- *funnel*: many-to-one messaging in a tight loop.
+- _funnel_: many-to-one messaging in a tight loop.
 
 Benchmarks always run on all available logical threads.
-
 
 ### Disclaimer
 
@@ -51,13 +51,12 @@ implementation and scheduling strategy of the executor, and performance
 variability is typically much higher than with synchronous code, in particular
 when the load is not sufficient to keep all worker threads busy.
 
-*Criterion*, the de-facto standard Rust benchmarking framework, cannot be used
+_Criterion_, the de-facto standard Rust benchmarking framework, cannot be used
 as it lacks support for task spawning and multithreading. This bench uses
 straightforward execution time measurement and statistical analysis, running
 long-lasting tests to reduce noise and minimize the impact of executor startup.
 Async executors are complex enough to prevent obvious benchmark-defeating
 compiler optimizations, so no black-boxing is implemented.
-
 
 ### Pinball
 
@@ -76,7 +75,6 @@ The test is performed for various numbers of messages ("balls"), which are
 initially fairly distributed across the graph. The messages then perform a
 random walk between the nodes ("pins") until they have visited a pre-defined
 amount of nodes.
-
 
 ### Funnel
 
@@ -99,7 +97,6 @@ channels, the MPSC channel of the `futures` crate reserves 1 additional slot for
 each of the 13 senders on top of the nominal capacity, so it has a slight
 advantage at low nominal capacities.
 
-
 ## Example usage
 
 For help, type:
@@ -114,8 +111,8 @@ To see all benchmarks for all channels, type:
 $ tachyobench -l
 ```
 
-To run the *pinball* benchmark for all channels using Tokio and write out the
-results to file *results.dat*, type:
+To run the _pinball_ benchmark for all channels using Tokio and write out the
+results to file _results.dat_, type:
 
 ```
 $ tachyobench pinball -o results.dat
@@ -127,19 +124,18 @@ To run all benchmarks for `tachonix` using Tokio, type:
 $ tachyobench tachyonix
 ```
 
-To run only the *funnel* benchmark for `flume` using Tokio and average the
+To run only the _funnel_ benchmark for `flume` using Tokio and average the
 results over 5 runs, type:
 
 ```
 $ tachyobench -s 5 funnel-flume
 ```
 
-To run all benchmarks for `async-channel` with Asynchronix instead of Tokio, type:
+To run all benchmarks for `async-channel` with NeXosim instead of Tokio, type:
 
 ```
-$ tachyobench async_channel -e asynchronix
+$ tachyobench async_channel -e nexosim
 ```
-
 
 ## License
 
